@@ -66,14 +66,14 @@ def getUsers(request):
 def getHomePageDetails(request):
     home = Homepage.objects.all()
     serailizer = HomePageSerializer(home, many=True)
-    return Response({'home detail':serailizer.data})
+    return Response(serailizer.data)
 
 
 @api_view(['GET'])
 def getMainDetails(request):
     main = MainSite.objects.all()
     serailizer = MainSiteSerializer(main, many=True)
-    return Response({'main detail':serailizer.data})
+    return Response(serailizer.data)
 
 
 # @api_view(['POST'])
