@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -69,10 +70,17 @@ DIRECTION_CHOICES =(
     ("2", "Right"),
 )
 
+BLOG_CHOICES =(
+    ("1", "Simple Blog"),
+    ("2", "Blog with product cards"),
+)
+
 class HomeBlog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=225,blank=True,null=True)
     description = models.CharField(max_length=225,blank=True,null=True)
     title_direction = models.CharField(choices = DIRECTION_CHOICES, max_length=225,blank=True,null=True)
+    blog_options = models.CharField(choices = BLOG_CHOICES, max_length=225,blank=True,null=True)
     Blog_image = models.ManyToManyField('BlogImage', blank=True)
     Blog_posts = models.ManyToManyField('BlogPost', blank=True)
 
