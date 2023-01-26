@@ -65,7 +65,7 @@ def getUsers(request):
 @api_view(['GET'])
 def getHomePageDetails(request):
     home = Homepage.objects.all()
-    serailizer = HomePageSerializer(home, many=True)
+    serailizer = HomePageSerializer(home[:1], many=True)
     return Response(serailizer.data)
 
 
