@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -42,6 +42,7 @@ class HomePageSerializer(serializers.ModelSerializer):
     Home_category = serializers.SerializerMethodField(read_only=True)
     HIW_steps = serializers.SerializerMethodField(read_only=True)
     Experts_blogs = serializers.SerializerMethodField(read_only=True)
+    Blog_articles = serializers.SerializerMethodField(read_only=True)
     Rev_reviews = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -61,6 +62,12 @@ class HomePageSerializer(serializers.ModelSerializer):
     def get_Experts_blogs(self, obj):
         Experts_blogs = obj.Experts_blogs.all()
         serializer = HomeBlogSerializer(Experts_blogs, many=True)
+        return serializer.data
+
+    def get_Blog_articles(self, obj):
+        Blog_articles = obj.Blog_articles.all()
+        lastTwo = Blog_articles[::-1]
+        serializer = HomeBlogArticleSerializer(lastTwo[:3], many=True)
         return serializer.data
     
     def get_Rev_reviews(self, obj):
@@ -84,6 +91,7 @@ class HomeStepSerializer(serializers.ModelSerializer):
 
 
 class HomeBlogSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
     Blog_image = serializers.SerializerMethodField(read_only=True)
     Blog_posts = serializers.SerializerMethodField(read_only=True)
 
@@ -99,6 +107,11 @@ class HomeBlogSerializer(serializers.ModelSerializer):
     def get_Blog_posts(self, obj):
         Blog_posts = obj.Blog_posts.all()
         serializer = BlogPostSerializer(Blog_posts, many=True)
+        return serializer.data
+    
+    def get_user(self, obj):
+        user = obj.user
+        serializer = UserSerializer(user, many=False)
         return serializer.data
 
 
@@ -116,8 +129,21 @@ class BlogPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class HomeReviewSerializer(serializers.ModelSerializer):
+class HomeBlogArticleSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
 
+    class Meta:
+        model = HomeBlogArticle
+        fields = '__all__'
+    
+    def get_user(self, obj):
+        user = obj.user
+        serializer = UserSerializer(user, many=False)
+        return serializer.data
+
+
+class HomeReviewSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = HomeReview
         fields = '__all__'

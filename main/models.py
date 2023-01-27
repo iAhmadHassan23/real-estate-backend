@@ -9,6 +9,7 @@ class MainSite(models.Model):
     favicon = models.ImageField(null=True, blank=True, default='/placeholder.png')
     head_logo = models.ImageField(null=True, blank=True, default='/placeholder.png')
     foot_logo = models.ImageField(null=True, blank=True, default='/placeholder.png')
+    foot_copyright = models.CharField(max_length=225,blank=True,null=True)
     facebook_link = models.CharField(max_length=225,blank=True,null=True)
     instagram_link = models.CharField(max_length=225,blank=True,null=True)
     twitter_link = models.CharField(max_length=225,blank=True,null=True)
@@ -35,6 +36,8 @@ class Homepage(models.Model):
     Experts_title = models.CharField(max_length=225,blank=True,null=True)
     Experts_tagline = models.CharField(max_length=225,blank=True,null=True)
     Experts_blogs = models.ManyToManyField('HomeBlog', blank=True)
+
+    Blog_articles = models.ManyToManyField('HomeBlogArticle', blank=True)
 
     Rev_title = models.CharField(max_length=225,blank=True,null=True)
     Rev_tagline = models.CharField(max_length=225,blank=True,null=True)
@@ -102,6 +105,18 @@ class BlogPost(models.Model):
 
 class BlogImage(models.Model):
     image = models.ImageField(null=True, blank=True, default='/placeholder.png')
+
+
+class HomeBlogArticle(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    title = models.CharField(max_length=225,blank=True,null=True)
+    description = models.CharField(max_length=225,blank=True,null=True)
+    image = models.ImageField(null=True, blank=True, default='/placeholder.png')
+
+    createdAt = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.title
+
 
 
 class HomeReview(models.Model):

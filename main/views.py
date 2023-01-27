@@ -8,8 +8,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite
-from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle
+from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogArticleSerializer
 
 # Create your views here.
 
@@ -165,6 +165,7 @@ def updateHomePage(request, id):
     blog_posts = BlogPost.objects.filter(id=data['blog_posts'])
     blog_images = BlogImage.objects.filter(id=data['blog_images'])
     home_blog = HomeBlog.objects.filter(id=data['home_blog'])
+    home_blog_article = HomeBlog.objects.filter(id=data['home_blog_article'])
     home_review = HomeReview.objects.filter(id=data['home_review'])
 
     home_category.title = data['hc_title']
@@ -191,6 +192,11 @@ def updateHomePage(request, id):
     home_blog.Blog_image = blog_images,
     home_blog.Blog_posts = blog_posts
 
+    home_blog_article.title = data['hba_title'],
+    home_blog_article.user = user,
+    home_blog_article.description = data['hba_description'],
+    home_blog_article.image = request.FILES.get('hba_image')
+
     home_review.name = data['hr_name'],
     home_review.profession = data['hr_profession'],
     home_review.star = data['hr_star'],
@@ -209,6 +215,7 @@ def updateHomePage(request, id):
     home.Experts_title= data['Experts_title']
     home.Experts_tagline= data['Experts_tagline']
     home.Experts_blogs= home_blog
+    home.Blog_articles= home_blog_article
     home.Rev_title= data['Rev_title']
     home.Rev_tagline= data['Rev_tagline']
     home.Rev_reviews= home_review,
