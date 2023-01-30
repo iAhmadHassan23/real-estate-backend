@@ -11,6 +11,8 @@ from django.contrib.auth.hashers import make_password
 from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData
 from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogArticleSerializer
 
+import json
+
 # Create your views here.
 
 
@@ -275,10 +277,11 @@ def updateMain(request):
     data=request.data
 
     print(data)
+    print(json.dumps(data['Main_metadata']))
 
     main=MainSite.objects.get(id=data['id'])
 
-    for metadata in data['Main_metadata']:
+    for metadata in json.dumps(data['Main_metadata']):
         if metadata['id'] != '':
             main_metadata=MetaData.objects.get(id=metadata['id'])
             main_metadata.name=metadata['name']
