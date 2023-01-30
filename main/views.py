@@ -277,11 +277,11 @@ def updateMain(request):
     data=request.data
 
     print(data)
-    print(json.dumps(data['Main_metadata']))
+    print(json.loads(data['Main_metadata']))
 
     main=MainSite.objects.get(id=data['id'])
 
-    for metadata in json.dumps(data['Main_metadata']):
+    for metadata in json.loads(data['Main_metadata']):
         if metadata['id'] != '':
             main_metadata=MetaData.objects.get(id=metadata['id'])
             main_metadata.name=metadata['name']
