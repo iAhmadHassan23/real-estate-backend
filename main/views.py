@@ -281,17 +281,36 @@ def updateMain(request):
 
     main=MainSite.objects.get(id=data['id'])
 
-    for metadata in json.loads(data['Main_metadata']):
-        if metadata['id'] != '':
+    metaSet = json.loads(data['Main_metadata'])
+
+    all_meta = main.Main_metadata.all()
+
+    meta_id_list = all_meta.values_list('id')
+
+
+    for meta in all_meta:
+        in_list = ['true' for item in metaSet if item['id'] == meta.id]
+
+        if 'true' not in in_list:
+            ingrDelete = MetaData.objects.get(id=meta.id)
+            ingrDelete.delete()
+            print('work3')
+
+    for metadata in metaSet:
+        in_list = ['true' for item in meta_id_list if item[0] == metadata['id']]
+
+        if 'true' in in_list:
             main_metadata=MetaData.objects.get(id=metadata['id'])
             main_metadata.name=metadata['name']
             main_metadata.save()
-        else:
+        elif 'true' not in in_list:
             main_metadata=MetaData.objects.create(
                 name=metadata['name']
             )
             main_metadata.save()
             main.Main_metadata.add(main_metadata)
+    
+
 
     main.title=data['title']
     if '/images/'+str(main.favicon) != data['favicon']:
