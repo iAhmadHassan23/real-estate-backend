@@ -174,8 +174,6 @@ def updateHomePage(request):
         home_step.description = steps['description']
         if '/images/'+str(home_step.icon) != steps['icon']:
             home_step.icon = steps['icon']
-        home_step.icon_color = steps['icon_color']
-        home_step.icon_color_bg = steps['icon_color_bg']
         home_step.save()
     for blogs in data['Experts_blogs']:
         home_blog = HomeBlog.objects.get(id=blogs['id'])
