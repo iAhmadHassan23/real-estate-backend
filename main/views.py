@@ -164,7 +164,7 @@ def uploadImage(request):
     print(data['image'])
     picture = Image.open(data['image'])  
     picture = picture.save('images/' + str(data['image_name']) + '.' + str(data['image_format'])) 
-    return Response({'/images/' + str(data['image_name']) + '.' + str(data['image_format'])})
+    return Response({'/' + str(data['image_name']) + '.' + str(data['image_format'])})
 
 
 @api_view(['PUT'])
