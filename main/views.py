@@ -173,7 +173,7 @@ def updateHomePage(request):
     data = request.data
     home = Homepage.objects.get(id=data['id'])
 
-    for category in json.loads(data['Home_category']):
+    for category in data['Home_category']:
         if category['id'] != '':
             home_category = HomeCategory.objects.get(id=category['id'])
             home_category.title = category['title']
@@ -190,7 +190,7 @@ def updateHomePage(request):
             home.Home_category.add(home_category)
 
 
-    for steps in json.loads(data['HIW_steps']):
+    for steps in data['HIW_steps']:
         if steps['id'] != '':
             home_step = HomeStep.objects.get(id=steps['id'])
             home_step.title = steps['title']
@@ -207,7 +207,7 @@ def updateHomePage(request):
             home_step.save()
             home.HIW_steps.add(home_step)
 
-    for blogs in json.loads(data['Experts_blogs']):
+    for blogs in data['Experts_blogs']:
         home_blog=HomeBlog.objects.get(id=blogs['id'])
         home_blog.title=blogs['title']
         home_blog.user=user
@@ -234,7 +234,7 @@ def updateHomePage(request):
         
 
         
-    for article in json.loads(data['Blog_articles']):
+    for article in data['Blog_articles']:
         home_blog_article=HomeBlogArticle.objects.get(id=article['id'])
         home_blog_article.title=article['title']
         home_blog_article.user=user
@@ -242,7 +242,7 @@ def updateHomePage(request):
         if '/images/'+str(home_blog_article.image) == article['image']:
             home_blog_article.image=article['image']
         home_blog_article.save()
-    for review in json.loads(data['Rev_reviews']):
+    for review in data['Rev_reviews']:
         if review['id'] != '':
             home_review=HomeReview.objects.get(id=review['id'])
             home_review.name=review['name']
