@@ -205,7 +205,7 @@ def updateHomePage(request):
         home_blog.title_direction=blogs['title_direction']
         home_blog.blog_options=blogs['blog_options']
         if len(blogs['Blog_image']) == 0:
-            for posts in json.loads(blogs['Blog_posts']):
+            for posts in blogs['Blog_posts']:
                 blog_posts=BlogPost.objects.get(id=posts['id'])
                 blog_posts.title=posts['title']
                 blog_posts.price=posts['price']
@@ -214,7 +214,7 @@ def updateHomePage(request):
                     blog_posts.image=posts['image']
                 blog_posts.save()
         else:
-            for image in json.loads(blogs['Blog_image']):
+            for image in blogs['Blog_image']:
                 blog_images=BlogImage.objects.get(id=image['id'])
                 if '/images/'+str(blog_images.image) != image['image']:
                     blog_images.image=image['image']
