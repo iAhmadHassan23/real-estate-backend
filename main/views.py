@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
 from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData
-from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogArticleSerializer
+from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogSerializer, HomeReviewSerializer
 
 import json
 
@@ -212,6 +212,7 @@ def updateHomePage(request):
         home_blog.title=blogs['title']
         home_blog.user=user
         home_blog.description=blogs['description']
+        home_blog.short_description=blogs['short_description']
         home_blog.title_direction=blogs['title_direction']
         home_blog.blog_options=blogs['blog_options']
         if len(blogs['Blog_image']) == 0:
@@ -341,3 +342,145 @@ def updateMain(request):
 
     serailizer=MainSiteSerializer(main, many=False)
     return Response({'main detail updated': serailizer.data})
+
+
+@api_view(['GET'])
+def allReviews(request):
+    review = HomeReview.objects.all()
+    serailizer = HomeReviewSerializer(review, many=True)
+    return Response(serailizer.data)
+
+
+@api_view(['GET'])
+def getReview(request, id):
+    review = HomeReview.objects.get(id=id)
+    serailizer = HomeReviewSerializer(review, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['POST'])
+def createReview(request):
+    data = request.data
+    review = HomeReview.objects.create(
+        name = data['name'],
+        profession = data['profession'],
+        star = data['star'],
+        comment = data['comment'],
+        image = data['image'],
+    )
+    review.save()
+    serailizer = HomeReviewSerializer(review, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['PUT'])
+def updateReview(request, id):
+    data = request.data
+    review = HomeReview.objects.get(id=id)
+    review.name = data['name']
+    review.profession = data['profession']
+    review.star = data['star']
+    review.comment = data['comment']
+    if '/images/'+str(review.image) != data['image']:
+        review.image = data['image']
+    review.save()
+    serailizer = HomeReviewSerializer(review, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['DELETE'])
+def deleteReview(request, id):
+    review = HomeReview.objects.get(id=id)
+    review.delete()
+    serailizer = HomeReviewSerializer(review, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['GET'])
+def allBlogs(request):
+    blogs = HomeBlog.objects.all()
+    serailizer = HomeBlogSerializer(blogs, many=True)
+    return Response(serailizer.data)
+
+
+@api_view(['GET'])
+def getBlog(request, id):
+    blog = HomeBlog.objects.get(id=id)
+    serailizer = HomeBlogSerializer(blog, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['POST'])
+def createBlog(request):
+    data = request.data
+    user = request.user
+
+    blog = HomeBlog.objects.create(
+        user = user,
+        title = data['title'],
+        description = data['description'],
+        short_description = data['short_description'],
+        blog_options = data['blog_options']
+    )
+    blog.save()
+
+    for image in data['Blog_image']:
+        blog_image = BlogImage.objects.create(
+            image = image['image']
+        )
+        blog_image.save()
+        blog.Blog_image.add(blog_image)
+
+    for post in data['Blog_posts']:
+        blog_post = BlogPost.objects.create(
+            title= post['title'],
+            star = post['star'],
+            price = post['price'],
+            image = post['image']
+        )
+        blog_post.save()
+        blog.Blog_image.add(blog_post)
+
+    serailizer = HomeBlogSerializer(blog, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['PUT'])
+def updateBlog(request, id):
+    data = request.data
+    user = request.user
+    blog = HomeBlog.objects.get(id=id)
+
+    blog.title=data['title']
+    blog.user=user
+    blog.description=data['description']
+    blog.short_description=data['short_description']
+    blog.blog_options=data['blog_options']
+
+    if len(blog['Blog_image']) == 0:
+        for posts in blog['Blog_posts']:
+            blog_posts = BlogPost.objects.get(id=posts['id'])
+            blog_posts.title=posts['title']
+            blog_posts.price=posts['price']
+            blog_posts.star=posts['star']
+            if '/images/'+str(blog_posts.image) != posts['image']:
+                blog_posts.image=posts['image']
+            blog_posts.save()
+    else:
+        for image in blog['Blog_image']:
+            blog_images=BlogImage.objects.get(id=image['id'])
+            if '/images/'+str(blog_images.image) != image['image']:
+                blog_images.image=image['image']
+            blog_images.save()
+
+    blog.save()
+    serailizer = HomeBlogSerializer(blog, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['DELETE'])
+def deleteBlog(request, id):
+    blog = HomeBlog.objects.get(id=id)
+    blog.delete()
+    serailizer = HomeBlogSerializer(blog, many=False)
+    return Response(serailizer.data)

@@ -81,6 +81,7 @@ class HomeBlog(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=225,blank=True, default='')
     description = models.CharField(max_length=225,blank=True, default='')
+    short_description = models.CharField(max_length=225,blank=True, default='')
     title_direction = models.CharField(choices = DIRECTION_CHOICES, max_length=225,blank=True, default='')
     blog_options = models.CharField(choices = BLOG_CHOICES, max_length=225,blank=True, default='')
     Blog_image = models.ManyToManyField('BlogImage', blank=True)
