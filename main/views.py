@@ -156,6 +156,16 @@ def getMainDetails(request):
 #     serailizer = HomePageSerializer(home, many=True)
 #     return Response({'home detail created':serailizer.data})
 
+from PIL import Image  
+
+@api_view(['POST'])
+def uploadImage(request):
+    data = request.data
+    print(data['image'])
+    picture = Image.open(data['image'])  
+    picture = picture.save('images/' + str(data['image_name']) + '.' + str(data['image_format'])) 
+    return Response({'/images/' + str(data['image_name']) + '.' + str(data['image_format'])})
+
 
 @api_view(['PUT'])
 def updateHomePage(request):
