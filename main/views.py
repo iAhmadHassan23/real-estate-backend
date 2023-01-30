@@ -241,7 +241,7 @@ def updateHomePage(request):
 def updateMain(request):
     data = request.data
 
-    main = MainSite.objects.get(id=id)
+    main = MainSite.objects.get(id=data['id'])
     main.title= data['title']
     if '/images/'+str(main.favicon) != data['favicon']:
         main.favicon = data['favicon']
