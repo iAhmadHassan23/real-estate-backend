@@ -302,10 +302,12 @@ def updateMain(request):
         if 'true' in in_list:
             main_metadata=MetaData.objects.get(id=metadata['id'])
             main_metadata.name=metadata['name']
+            main_metadata.content=metadata['content']
             main_metadata.save()
         elif 'true' not in in_list:
             main_metadata=MetaData.objects.create(
                 name=metadata['name']
+                content=metadata['content']
             )
             main_metadata.save()
             main.Main_metadata.add(main_metadata)
