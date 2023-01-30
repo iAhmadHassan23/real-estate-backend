@@ -155,91 +155,117 @@ def getMainDetails(request):
 
 
 @api_view(['PUT'])
-def updateHomePage(request, id):
+def updateHomePage(request):
     user = request.user
     data = request.data
+    home = Homepage.objects.get(id=data['id'])
+    
+    
+    for category in data['Home_category']:
+        home_category = HomeCategory.objects.get(id=category['id'])
+        home_category.title = category['title']
+        print(category['icon'])
+        if '/images/'+str(home_category.icon) != category['icon']:
+            home_category.icon = category['icon']
+        home_category.save()
+    for steps in data['HIW_steps']:
+        home_step = HomeStep.objects.get(id=steps['id'])
+        home_step.title = steps['title']
+        home_step.description = steps['description']
+        if '/images/'+str(home_step.icon) != steps['icon']:
+            home_step.icon = steps['icon']
+        home_step.icon_color = steps['icon_color']
+        home_step.icon_color_bg = steps['icon_color_bg']
+        home_step.save()
+    for blogs in data['Experts_blogs']:
+        home_blog = HomeBlog.objects.get(id=blogs['id'])
+        home_blog.title = blogs['title']
+        home_blog.user = user
+        home_blog.description = blogs['description']
+        home_blog.title_direction = blogs['title_direction']
+        home_blog.blog_options = blogs['blog_options']
+        if len(blogs['Blog_image']) == 0:
+            for posts in blogs['Blog_posts']:
+                blog_posts = BlogPost.objects.get(id=posts['id'])
+                blog_posts.title = posts['title']
+                blog_posts.price = posts['price']
+                blog_posts.star = posts['star']
+                if '/images/'+str(blog_posts.image) != posts['image']:
+                    blog_posts.image = posts['image']
+                blog_posts.save()
+        else:
+            for image in blogs['Blog_image']:
+                blog_images = BlogImage.objects.get(id=image['id'])
+                if '/images/'+str(blog_images.image) != image['image']:
+                    blog_images.image = image['image']
+                blog_images.save()
+        home_blog.save()
+    for article in data['Blog_articles']:
+        home_blog_article = HomeBlogArticle.objects.get(id=article['id'])
+        home_blog_article.title = article['title']
+        home_blog_article.user = user
+        home_blog_article.description = article['description']
+        if '/images/'+str(home_blog_article.image) == article['image']:
+            home_blog_article.image = article['image']
+        home_blog_article.save()
+    for review in data['Rev_reviews']:
+        home_review = HomeReview.objects.get(id=review['id'])
+        home_review.name = review['name']
+        home_review.profession = review['profession']
+        home_review.star = review['star']
+        home_review.comment = review['comment']
+        if '/images/'+str(home_review.image) == review['image']:
+            home_review.image = review['image']
+        home_review.save()
 
-    home = Homepage.objects.filter(id=id)
-    home_category = HomeCategory.objects.filter(id=data['home_category'])
-    home_step = HomeStep.objects.filter(id=data['home_step'])
-    blog_posts = BlogPost.objects.filter(id=data['blog_posts'])
-    blog_images = BlogImage.objects.filter(id=data['blog_images'])
-    home_blog = HomeBlog.objects.filter(id=data['home_blog'])
-    home_blog_article = HomeBlog.objects.filter(id=data['home_blog_article'])
-    home_review = HomeReview.objects.filter(id=data['home_review'])
-
-    home_category.title = data['hc_title']
-    home_category.icon = request.FILES.get('hc_icon')
-
-    home_step.title = data['hs_title']
-    home_step.description = data['hs_description']
-    home_step.icon = request.FILES.get('hs_icon')
-    home_step.icon_color = data['hs_icon_color']
-    home_step.icon_color_bg = data['hs_icon_color_bg']
-
-    blog_posts.title = data['bp_title'],
-    blog_posts.price = data['bp_price'],
-    blog_posts.star = data['bp_star'],
-    blog_posts.image = request.FILES.get('bp_image')
-
-    blog_images.image = request.FILES.get('bi_image')
-
-    home_blog.title = data['hb_title'],
-    home_blog.user = user,
-    home_blog.description = data['hb_description'],
-    home_blog.title_direction = data['hb_title_direction'],
-    home_blog.blog_options = data['hb_blog_options'],
-    home_blog.Blog_image = blog_images,
-    home_blog.Blog_posts = blog_posts
-
-    home_blog_article.title = data['hba_title'],
-    home_blog_article.user = user,
-    home_blog_article.description = data['hba_description'],
-    home_blog_article.image = request.FILES.get('hba_image')
-
-    home_review.name = data['hr_name'],
-    home_review.profession = data['hr_profession'],
-    home_review.star = data['hr_star'],
-    home_review.comment = data['hr_comment'],
-    home_review.image = request.FILES.get('hr_image'),
-
-    home.Home_title= data['Home_title'],
-    home.Home_tagline= data['Home_tagline'],
+    home.Home_title= data['Home_title']
+    home.Home_tagline= data['Home_tagline']
     home.Home_button= data['Home_button']
     home.Home_button_link= data['Home_button_link']
-    home.Home_bgimg= request.FILES.get('Home_bgimg')
-    home.Home_category= home_category
+    if '/images/'+str(home.Home_bgimg) != data['Home_bgimg']:
+        home.Home_bgimg= data['Home_bgimg']
     home.HIW_title= data['HIW_title']
     home.HIW_tagline= data['HIW_tagline']
-    home.HIW_steps= home_step
     home.Experts_title= data['Experts_title']
     home.Experts_tagline= data['Experts_tagline']
-    home.Experts_blogs= home_blog
-    home.Blog_articles= home_blog_article
     home.Rev_title= data['Rev_title']
     home.Rev_tagline= data['Rev_tagline']
-    home.Rev_reviews= home_review,
 
-    serailizer = HomePageSerializer(home, many=True)
+    home.save()
+
+    serailizer = HomePageSerializer(home, many=False)
     return Response({'home detail updated':serailizer.data})
 
 
 @api_view(['PUT'])
-def updateMain(request, id):
+def updateMain(request):
     data = request.data
 
-    main = MainSite.objects.filter(id=id)
-
+    main = MainSite.objects.get(id=id)
     main.title= data['title']
-    main.favicon = request.FILES.get('favicon')
-    main.head_logo = request.FILES.get('head_logo')
-    main.foot_logo = request.FILES.get('foot_logo')
+    if '/images/'+str(main.favicon) != data['favicon']:
+        main.favicon = data['favicon']
+    if '/images/'+str(main.head_logo) != data['head_logo']:
+        main.head_logo = data['head_logo']
+    if '/images/'+str(main.foot_logo) != data['foot_logo']:
+        main.foot_logo = data['foot_logo']
+    main.foot_copyright = data['foot_copyright']
+    main.facebook_link = data['facebook_link']
     main.facebook_link = data['facebook_link']
     main.instagram_link = data['instagram_link']
     main.twitter_link = data['twitter_link']
     main.youtube_link = data['youtube_link']
     main.linkin_link = data['linkin_link']
-
+    main.save()
     
-    serailizer = MainSiteSerializer(main, many=True)
+    serailizer = MainSiteSerializer(main, many=False)
     return Response({'main detail updated':serailizer.data})
+
+
+
+
+
+
+
+
+
