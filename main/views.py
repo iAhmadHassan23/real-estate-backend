@@ -274,11 +274,13 @@ def updateHomePage(request):
 def updateMain(request):
     data=request.data
 
+    print(data)
+
     main=MainSite.objects.get(id=data['id'])
 
     for metadata in data['Main_metadata']:
         if metadata['id'] != '':
-            main_metadata=HomeCategory.objects.get(id=metadata['id'])
+            main_metadata=MetaData.objects.get(id=metadata['id'])
             main_metadata.name=metadata['name']
             main_metadata.save()
         else:
