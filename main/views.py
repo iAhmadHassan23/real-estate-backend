@@ -306,7 +306,7 @@ def updateMain(request):
             main_metadata.save()
         elif 'true' not in in_list:
             main_metadata=MetaData.objects.create(
-                name=metadata['name']
+                name=metadata['name'],
                 content=metadata['content']
             )
             main_metadata.save()
