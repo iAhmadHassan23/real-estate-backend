@@ -159,6 +159,7 @@ def getMainDetails(request):
 from PIL import Image  
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def uploadImage(request):
     data = request.data
     print(data['image'])
@@ -168,6 +169,7 @@ def uploadImage(request):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateHomePage(request):
     user = request.user
     data = request.data
@@ -284,6 +286,7 @@ def updateHomePage(request):
 
 
 @ api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateMain(request):
     data=request.data
 
@@ -359,23 +362,50 @@ def getReview(request, id):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def createReview(request):
     data = request.data
-    review = HomeReview.objects.create(
-        name = data['name'],
-        profession = data['profession'],
-        star = data['star'],
-        comment = data['comment'],
-        image = data['image'],
-    )
-    review.save()
-    serailizer = HomeReviewSerializer(review, many=False)
-    return Response(serailizer.data)
+
+    if data['name'] == '':
+        return Response('Please Enter Name')
+    if data['profession'] == '':
+        return Response('Please Enter Profession')
+    if data['star'] == '':
+        return Response('Please Enter Star')
+    if data['comment'] == '':
+        return Response('Please Enter Comment')
+    if data['image'] == '':
+        return Response('Please Enter Image')
+    
+    else:
+        review = HomeReview.objects.create(
+            name = data['name'],
+            profession = data['profession'],
+            star = data['star'],
+            comment = data['comment'],
+            image = data['image'],
+        )
+        review.save()
+        serailizer = HomeReviewSerializer(review, many=False)
+        return Response(serailizer.data)
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateReview(request, id):
     data = request.data
+
+    if data['name'] == '':
+        return Response('Please Enter Name')
+    if data['profession'] == '':
+        return Response('Please Enter Profession')
+    if data['star'] == '':
+        return Response('Please Enter Star')
+    if data['comment'] == '':
+        return Response('Please Enter Comment')
+    if data['image'] == '':
+        return Response('Please Enter Image')
+
     review = HomeReview.objects.get(id=id)
     review.name = data['name']
     review.profession = data['profession']
@@ -389,6 +419,7 @@ def updateReview(request, id):
 
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteReview(request, id):
     review = HomeReview.objects.get(id=id)
     review.delete()
@@ -411,9 +442,29 @@ def getBlog(request, id):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def createBlog(request):
     data = request.data
     user = request.user
+
+    if data['title'] == '':
+        return Response('Please Enter Title')
+    if data['description'] == '':
+        return Response('Please Enter Description')
+    if data['blog_options'] == '':
+        return Response('Please Enter Blog_options')
+    if len(data['Blog_image']) == 0:
+        if data['image'] == '':
+            return Response('Please Enter Post Image')
+        if data['title'] == '':
+            return Response('Please Enter Post Title')
+        if data['star'] == '':
+            return Response('Please Enter Post Star')
+        if data['price'] == '':
+            return Response('Please Enter Post Price')
+    else:
+        if data['image'] == '':
+            return Response('Please Enter Post Image')
 
     blog = HomeBlog.objects.create(
         user = user,
@@ -424,32 +475,53 @@ def createBlog(request):
     )
     blog.save()
 
-    for image in data['Blog_image']:
-        blog_image = BlogImage.objects.create(
-            image = image['image']
-        )
-        blog_image.save()
-        blog.Blog_image.add(blog_image)
-
-    for post in data['Blog_posts']:
-        blog_post = BlogPost.objects.create(
-            title= post['title'],
-            star = post['star'],
-            price = post['price'],
-            image = post['image']
-        )
-        blog_post.save()
-        blog.Blog_image.add(blog_post)
+    if len(data['Blog_image']) != 0:
+        for image in data['Blog_image']:
+            blog_image = BlogImage.objects.create(
+                image = image['image']
+            )
+            blog_image.save()
+            blog.Blog_image.add(blog_image)
+    else:
+        for post in data['Blog_posts']:
+            blog_post = BlogPost.objects.create(
+                title= post['title'],
+                star = post['star'],
+                price = post['price'],
+                image = post['image']
+            )
+            blog_post.save()
+            blog.Blog_image.add(blog_post)
 
     serailizer = HomeBlogSerializer(blog, many=False)
     return Response(serailizer.data)
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateBlog(request, id):
     data = request.data
     user = request.user
     blog = HomeBlog.objects.get(id=id)
+
+    if data['title'] == '':
+        return Response('Please Enter Title')
+    if data['description'] == '':
+        return Response('Please Enter Description')
+    if data['blog_options'] == '':
+        return Response('Please Enter Blog_options')
+    if len(data['Blog_image']) == 0:
+        if data['image'] == '':
+            return Response('Please Enter Post Image')
+        if data['title'] == '':
+            return Response('Please Enter Post Title')
+        if data['star'] == '':
+            return Response('Please Enter Post Star')
+        if data['price'] == '':
+            return Response('Please Enter Post Price')
+    else:
+        if data['image'] == '':
+            return Response('Please Enter Post Image')
 
     blog.title=data['title']
     blog.user=user
@@ -479,6 +551,7 @@ def updateBlog(request, id):
 
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteBlog(request, id):
     blog = HomeBlog.objects.get(id=id)
     blog.delete()
