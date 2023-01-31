@@ -424,7 +424,7 @@ def deleteReview(request, id):
     review = HomeReview.objects.get(id=id)
     review.delete()
     serailizer = HomeReviewSerializer(review, many=False)
-    return Response(serailizer.data)
+    return Response("Review Deleted")
 
 
 @api_view(['GET'])
@@ -557,10 +557,12 @@ def updateBlog(request, id):
     return Response(serailizer.data)
 
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteBlog(request, id):
     blog = HomeBlog.objects.get(id=id)
+    print(blog)
     blog.delete()
     serailizer = HomeBlogSerializer(blog, many=False)
-    return Response(serailizer.data)
+    return Response("Blog Deleted")
