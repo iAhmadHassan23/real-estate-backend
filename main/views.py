@@ -454,17 +454,19 @@ def createBlog(request):
     if data['blog_options'] == '':
         return Response('Please Enter Blog_options')
     if len(data['Blog_image']) == 0:
-        if data['image'] == '':
-            return Response('Please Enter Post Image')
-        if data['title'] == '':
-            return Response('Please Enter Post Title')
-        if data['star'] == '':
-            return Response('Please Enter Post Star')
-        if data['price'] == '':
-            return Response('Please Enter Post Price')
+        for post in data['Blog_posts']:
+            if post['image'] == '':
+                return Response('Please Enter Post Image')
+            if post['title'] == '':
+                return Response('Please Enter Post Title')
+            if post['star'] == '':
+                return Response('Please Enter Post Star')
+            if post['price'] == '':
+                return Response('Please Enter Post Price')
     else:
-        if data['image'] == '':
-            return Response('Please Enter Post Image')
+        for image in data['Blog_image']:
+            if image['image'] == '':
+                return Response('Please Enter Post Image')
 
     blog = HomeBlog.objects.create(
         user = user,
@@ -529,21 +531,26 @@ def updateBlog(request, id):
     blog.short_description=data['short_description']
     blog.blog_options=data['blog_options']
 
-    if len(blog['Blog_image']) == 0:
-        for posts in blog['Blog_posts']:
-            blog_posts = BlogPost.objects.get(id=posts['id'])
-            blog_posts.title=posts['title']
-            blog_posts.price=posts['price']
-            blog_posts.star=posts['star']
-            if '/images/'+str(blog_posts.image) != posts['image']:
-                blog_posts.image=posts['image']
-            blog_posts.save()
+    if data['title'] == '':
+        return Response('Please Enter Title')
+    if data['description'] == '':
+        return Response('Please Enter Description')
+    if data['blog_options'] == '':
+        return Response('Please Enter Blog_options')
+    if len(data['Blog_image']) == 0:
+        for post in data['Blog_posts']:
+            if post['image'] == '':
+                return Response('Please Enter Post Image')
+            if post['title'] == '':
+                return Response('Please Enter Post Title')
+            if post['star'] == '':
+                return Response('Please Enter Post Star')
+            if post['price'] == '':
+                return Response('Please Enter Post Price')
     else:
-        for image in blog['Blog_image']:
-            blog_images=BlogImage.objects.get(id=image['id'])
-            if '/images/'+str(blog_images.image) != image['image']:
-                blog_images.image=image['image']
-            blog_images.save()
+        for image in data['Blog_image']:
+            if image['image'] == '':
+                return Response('Please Enter Post Image')
 
     blog.save()
     serailizer = HomeBlogSerializer(blog, many=False)
