@@ -622,16 +622,27 @@ def sendContactUs(request):
     data = request.data
     user = request.user
 
+    error = False
+    message = []
+
     if data['name'] == '':
-        return Response('Please Enter Your Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Name')
     if data['email'] == '':
-        return Response('Please Enter Your Email', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Email')
     if data['contact'] == '':
-        return Response('Please Enter Your Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Contact Number')
     if len(data['contact']) > 15:
-        return Response('Please Enter Valid Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Valid Contact Number')
     if data['message'] == '':
-        return Response('Please Enter Message', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Message')
+
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     contact = ContactUs.objects.create(
         name = data['name'],
