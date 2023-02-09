@@ -143,7 +143,7 @@ class MetaData(models.Model):
 
 class Quotation(models.Model):
     size = models.CharField(max_length=225,blank=True, default='')
-    budget = models.FloatField(blank=True, default=0)
+    budget = models.CharField(max_length=225,blank=True, default='')
     time = models.CharField(max_length=225,blank=True, default='')
     name = models.CharField(max_length=225,blank=True, default='')
     email = models.CharField(max_length=225,blank=True, default='')

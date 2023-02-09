@@ -8,7 +8,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
+from django.template.loader import render_to_string
 
 from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs
 from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogSerializer, HomeReviewSerializer, QuotationSerializer, ContactUsSerializer
@@ -669,11 +670,30 @@ def sendQuotation(request):
     )
     quotation.save()
 
-    subject = 'Email Sent Testing'
-    message = f'Hi {quotation.name}, Email is working good.'
+    subject = f"Quotation Request for {quotation.size} appartment"
+    message = f"Client need {quotation.size} appartment for {quotation.time} having budget {quotation.budget}. \n Client Detail: \n Name: {quotation.name} \n Email: {quotation.email} \n Contact #: {quotation.contact} \n Comment: '{quotation.comment}"
+    html_template = 'emailtemplate.html'
+    context = {'message': message, 'name': settings.EMAIL_HOST_USER}
+    html_message = render_to_string(html_template, context=context)
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [settings.EMAIL_HOST_USER, quotation.email, ]
+    email_message = EmailMessage( subject, html_message, email_from, recipient_list )
+
+    email_message.content_subtype = 'html'
+    email_message.send()
+
+
+    subject = 'Successfully send request for quotation'
+    message = f'Your request for quotation is recieved.'
+    html_template = 'emailtemplate.html'
+    context = {'message': message, 'name': quotation.name, 'email': quotation.email, 'contact': quotation.contact }
+    html_message = render_to_string(html_template, context=context)
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [quotation.email, ]
-    send_mail( subject, message, email_from, recipient_list )
+    email_message = EmailMessage( subject, html_message, email_from, recipient_list )
+
+    email_message.content_subtype = 'html'
+    email_message.send()
 
     serailizer = QuotationSerializer(quotation, many=False)
     return Response(serailizer.data)
@@ -711,17 +731,30 @@ def sendContactUs(request):
     )
     contact.save()
 
-    subject = 'Email Sent Testing'
+    subject = f"{contact.name} want to contact with you!"
     message = f"Message \n '{contact.message}' \n recived from: \n Name: {contact.name} \n Email: {contact.email} \n Contact #: {contact.contact} "
+    html_template = 'emailtemplate.html'
+    context = {'message': message, 'name': settings.EMAIL_HOST_USER}
+    html_message = render_to_string(html_template, context=context)
     email_from = settings.EMAIL_HOST_USER
-    recipient_list = [settings.EMAIL_HOST_USER, ]
-    send_mail( subject, message, email_from, recipient_list )
+    recipient_list = [settings.EMAIL_HOST_USER, contact.email, ]
+    email_message = EmailMessage( subject, html_message, email_from, recipient_list )
 
-    subject = 'Email Sent Testing'
-    message = f'Hi {contact.name}, Thankyou for contacting us.'
+    email_message.content_subtype = 'html'
+    email_message.send()
+
+
+    subject = 'Contact with Apartmentgoats'
+    message = f'Thankyou for contacting us.'
+    html_template = 'emailtemplate.html'
+    context = {'message': message, 'name': contact.name, 'email': contact.email, 'contact': contact.contact }
+    html_message = render_to_string(html_template, context=context)
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [contact.email, ]
-    send_mail( subject, message, email_from, recipient_list )
+    email_message = EmailMessage( subject, html_message, email_from, recipient_list )
+
+    email_message.content_subtype = 'html'
+    email_message.send()
 
     serailizer = ContactUsSerializer(contact, many=False)
     return Response(serailizer.data)
