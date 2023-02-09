@@ -131,6 +131,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+DEFAULT_FROM_EMAIL = "info@pakwancenter.com"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.pakwancenter.com'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = 'info@pakwancenter.com'
+EMAIL_HOST_PASSWORD = 'P@kMan C0ntA'
+EMAIL_USE_TLS = True
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

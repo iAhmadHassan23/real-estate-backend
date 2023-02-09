@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -167,3 +167,17 @@ class MainSiteSerializer(serializers.ModelSerializer):
         Main_metadata = obj.Main_metadata.all()
         serializer = MetaDataSerializer(Main_metadata, many=True)
         return serializer.data
+
+
+class QuotationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Quotation
+        fields = '__all__'
+
+
+class ContactUsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ContactUs
+        fields = '__all__'

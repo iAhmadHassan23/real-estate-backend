@@ -139,3 +139,28 @@ class MetaData(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.name
+
+
+class Quotation(models.Model):
+    size = models.CharField(max_length=225,blank=True, default='')
+    budget = models.FloatField(blank=True, default=0)
+    time = models.CharField(max_length=225,blank=True, default='')
+    name = models.CharField(max_length=225,blank=True, default='')
+    email = models.CharField(max_length=225,blank=True, default='')
+    contact = models.DecimalField(max_digits=15, decimal_places=0, blank=True, default=0)
+    comment = models.CharField(max_length=500,blank=True, default='')
+    
+    createdAt = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.name
+
+
+class ContactUs(models.Model):
+    name = models.CharField(max_length=225,blank=True, default='')
+    email = models.CharField(max_length=225,blank=True, default='')
+    contact = models.DecimalField(max_digits=15, decimal_places=0, blank=True, default=0)
+    message = models.CharField(max_length=500,blank=True, default='')
+    
+    createdAt = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.name

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs
 
 # Register your models here.
 
@@ -13,3 +13,5 @@ admin.site.register(BlogImage)
 admin.site.register(BlogPost)
 admin.site.register(HomeBlogArticle)
 admin.site.register(MetaData)
+admin.site.register(Quotation)
+admin.site.register(ContactUs)

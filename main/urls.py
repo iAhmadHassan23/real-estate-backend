@@ -27,4 +27,7 @@ urlpatterns = [
     path('get/blog/<str:id>/', views.getBlog, name="get-Blog"),
     path('update/blog/<str:id>/', views.updateBlog, name="update-Blog"),
     path('delete/blog/<str:id>/', views.deleteBlog, name="delete-Blog"),
+
+    path('send/quotation/', views.sendQuotation, name="send-quotation"),
+    path('send/contactus/', views.sendContactUs, name="send-ContactUs"),
 ]

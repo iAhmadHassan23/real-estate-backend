@@ -7,9 +7,11 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
+from django.core.mail import send_mail
 
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData
-from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogSerializer, HomeReviewSerializer
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs
+from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogSerializer, HomeReviewSerializer, QuotationSerializer, ContactUsSerializer
 
 import json
 
@@ -563,3 +565,93 @@ def deleteBlog(request, id):
     blog.delete()
     serailizer = HomeBlogSerializer(blog, many=False)
     return Response("Blog Deleted")
+
+
+@api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+def sendQuotation(request):
+    data = request.data
+    user = request.user
+
+    if data['size'] == '':
+        return Response('Please Select Size')
+    if data['time'] == '':
+        return Response('Please Select Time')
+    if data['budget'] == '':
+        return Response('Please Enter Your Budget')
+    if data['name'] == '':
+        return Response('Please Enter Your Name')
+    if data['email'] == '':
+        return Response('Please Enter Your Email')
+    if data['contact'] == '':
+        return Response('Please Enter Your Contact Number')
+    if len(data['contact']) > 15:
+        return Response('Please Enter Valid Contact Number')
+
+    print(data['size'],
+        data['time'],
+        data['budget'],
+        data['name'],
+        data['email'],
+        data['contact'],
+        data['comment'])
+    quotation = Quotation.objects.create(
+        size = data['size'],
+        time = data['time'],
+        budget = data['budget'],
+        name = data['name'],
+        email = data['email'],
+        contact = data['contact'],
+        comment = data['comment'],
+    )
+    quotation.save()
+
+    subject = 'Email Sent Testing'
+    message = f'Hi {quotation.name}, Email is working good.'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [quotation.email, ]
+    send_mail( subject, message, email_from, recipient_list )
+
+    serailizer = QuotationSerializer(quotation, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+def sendContactUs(request):
+    data = request.data
+    user = request.user
+
+    if data['name'] == '':
+        return Response('Please Enter Your Name')
+    if data['email'] == '':
+        return Response('Please Enter Your Email')
+    if data['contact'] == '':
+        return Response('Please Enter Your Contact Number')
+    if len(data['contact']) > 15:
+        return Response('Please Enter Valid Contact Number')
+    if len(data['message']) == '':
+        return Response('Please Enter Message')
+
+    contact = ContactUs.objects.create(
+        name = data['name'],
+        email = data['email'],
+        contact = data['contact'],
+        message = data['message'],
+    )
+    contact.save()
+
+    subject = 'Email Sent Testing'
+    message = f"Message \n '{contact.message}' \n recived from: \n Name: {contact.name} \n Email: {contact.email} \n Contact #: {contact.contact} "
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [settings.EMAIL_HOST_USER, ]
+    send_mail( subject, message, email_from, recipient_list )
+
+    subject = 'Email Sent Testing'
+    message = f'Hi {contact.name}, Thankyou for contacting us.'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [contact.email, ]
+    send_mail( subject, message, email_from, recipient_list )
+
+    serailizer = ContactUsSerializer(contact, many=False)
+    return Response(serailizer.data)
