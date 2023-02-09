@@ -369,15 +369,15 @@ def createReview(request):
     data = request.data
 
     if data['name'] == '':
-        return Response('Please Enter Name')
+        return Response('Please Enter Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['profession'] == '':
-        return Response('Please Enter Profession')
+        return Response('Please Enter Profession', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['star'] == '':
-        return Response('Please Enter Star')
+        return Response('Please Enter Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['comment'] == '':
-        return Response('Please Enter Comment')
+        return Response('Please Enter Comment', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['image'] == '':
-        return Response('Please Enter Image')
+        return Response('Please Enter Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     
     else:
         review = HomeReview.objects.create(
@@ -398,15 +398,15 @@ def updateReview(request, id):
     data = request.data
 
     if data['name'] == '':
-        return Response('Please Enter Name')
+        return Response('Please Enter Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['profession'] == '':
-        return Response('Please Enter Profession')
+        return Response('Please Enter Profession', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['star'] == '':
-        return Response('Please Enter Star')
+        return Response('Please Enter Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['comment'] == '':
-        return Response('Please Enter Comment')
+        return Response('Please Enter Comment', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['image'] == '':
-        return Response('Please Enter Image')
+        return Response('Please Enter Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     review = HomeReview.objects.get(id=id)
     review.name = data['name']
@@ -450,25 +450,25 @@ def createBlog(request):
     user = request.user
 
     if data['title'] == '':
-        return Response('Please Enter Title')
+        return Response('Please Enter Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['description'] == '':
-        return Response('Please Enter Description')
+        return Response('Please Enter Description', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['blog_options'] == '':
-        return Response('Please Enter Blog_options')
+        return Response('Please Enter Blog_options', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
-                return Response('Please Enter Post Image')
+                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             if post['title'] == '':
-                return Response('Please Enter Post Title')
+                return Response('Please Enter Post Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             if post['star'] == '':
-                return Response('Please Enter Post Star')
+                return Response('Please Enter Post Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             if post['price'] == '':
-                return Response('Please Enter Post Price')
+                return Response('Please Enter Post Price', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
-                return Response('Please Enter Post Image')
+                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     blog = HomeBlog.objects.create(
         user = user,
@@ -509,25 +509,25 @@ def updateBlog(request, id):
     blog = HomeBlog.objects.get(id=id)
 
     if data['title'] == '':
-        return Response('Please Enter Title')
+        return Response('Please Enter Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['description'] == '':
-        return Response('Please Enter Description')
+        return Response('Please Enter Description', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['blog_options'] == '':
-        return Response('Please Enter Blog_options')
+        return Response('Please Enter Blog_options', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
-                return Response('Please Enter Post Image')
+                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             if post['title'] == '':
-                return Response('Please Enter Post Title')
+                return Response('Please Enter Post Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             if post['star'] == '':
-                return Response('Please Enter Post Star')
+                return Response('Please Enter Post Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             if post['price'] == '':
-                return Response('Please Enter Post Price')
+                return Response('Please Enter Post Price', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
-                return Response('Please Enter Post Image')
+                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     blog.title=data['title']
     blog.user=user
@@ -574,19 +574,19 @@ def sendQuotation(request):
     user = request.user
 
     if data['size'] == '':
-        return Response('Please Select Size')
+        return Response('Please Select Size', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['time'] == '':
-        return Response('Please Select Time')
+        return Response('Please Select Time', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['budget'] == '':
-        return Response('Please Enter Your Budget')
+        return Response('Please Enter Your Budget', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['name'] == '':
-        return Response('Please Enter Your Name')
+        return Response('Please Enter Your Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['email'] == '':
-        return Response('Please Enter Your Email')
+        return Response('Please Enter Your Email', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['contact'] == '':
-        return Response('Please Enter Your Contact Number')
+        return Response('Please Enter Your Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if len(data['contact']) > 15:
-        return Response('Please Enter Valid Contact Number')
+        return Response('Please Enter Valid Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     print(data['size'],
         data['time'],
@@ -623,15 +623,15 @@ def sendContactUs(request):
     user = request.user
 
     if data['name'] == '':
-        return Response('Please Enter Your Name')
+        return Response('Please Enter Your Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['email'] == '':
-        return Response('Please Enter Your Email')
+        return Response('Please Enter Your Email', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if data['contact'] == '':
-        return Response('Please Enter Your Contact Number')
+        return Response('Please Enter Your Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     if len(data['contact']) > 15:
-        return Response('Please Enter Valid Contact Number')
-    if len(data['message']) == '':
-        return Response('Please Enter Message')
+        return Response('Please Enter Valid Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    if data['message'] == '':
+        return Response('Please Enter Message', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     contact = ContactUs.objects.create(
         name = data['name'],
