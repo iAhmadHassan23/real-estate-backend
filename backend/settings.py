@@ -131,12 +131,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-DEFAULT_FROM_EMAIL = "info@pakwancenter.com"
+DEFAULT_FROM_EMAIL = "hello@apartmentgoats.com"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.pakwancenter.com'
+EMAIL_HOST = 'mail.apartmentgoats.com'
 EMAIL_PORT = 2525
-EMAIL_HOST_USER = 'info@pakwancenter.com'
-EMAIL_HOST_PASSWORD = 'P@kMan C0ntA'
+EMAIL_HOST_USER = 'hello@apartmentgoats.com'
+EMAIL_HOST_PASSWORD = "[z!Ye*fMjcV"
 EMAIL_USE_TLS = True
 
 
