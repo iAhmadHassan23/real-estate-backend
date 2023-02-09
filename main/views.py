@@ -449,26 +449,40 @@ def createBlog(request):
     data = request.data
     user = request.user
 
+    error = False
+    message = []
+
     if data['title'] == '':
-        return Response('Please Enter Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Title')
     if data['description'] == '':
-        return Response('Please Enter Description', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Description')
     if data['blog_options'] == '':
-        return Response('Please Enter Blog_options', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Blog_options')
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
-                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message.append('Please Enter Post Image')
             if post['title'] == '':
-                return Response('Please Enter Post Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message.append('Please Enter Post Title')
             if post['star'] == '':
-                return Response('Please Enter Post Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message.append('Please Enter Post Star')
             if post['price'] == '':
-                return Response('Please Enter Post Price', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message.append('Please Enter Post Price')
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
-                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message.append('Please Enter Post Image')
+    
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     blog = HomeBlog.objects.create(
         user = user,
@@ -508,26 +522,40 @@ def updateBlog(request, id):
     user = request.user
     blog = HomeBlog.objects.get(id=id)
 
+    error = False
+    message = []
+
     if data['title'] == '':
-        return Response('Please Enter Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message('Please Enter Title')
     if data['description'] == '':
-        return Response('Please Enter Description', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message('Please Enter Description')
     if data['blog_options'] == '':
-        return Response('Please Enter Blog_options', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message('Please Enter Blog_options')
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
-                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message('Please Enter Post Image')
             if post['title'] == '':
-                return Response('Please Enter Post Title', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message('Please Enter Post Title')
             if post['star'] == '':
-                return Response('Please Enter Post Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message('Please Enter Post Star')
             if post['price'] == '':
-                return Response('Please Enter Post Price', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message('Please Enter Post Price')
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
-                return Response('Please Enter Post Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                error = True
+                message('Please Enter Post Image')
+    
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     blog.title=data['title']
     blog.user=user
@@ -571,22 +599,35 @@ def deleteBlog(request, id):
 # @permission_classes([IsAuthenticated])
 def sendQuotation(request):
     data = request.data
-    user = request.user
+
+    error = False
+    message = []
+
 
     if data['size'] == '':
-        return Response('Please Select Size', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Select Size')
     if data['time'] == '':
-        return Response('Please Select Time', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Select Time')
     if data['budget'] == '':
-        return Response('Please Enter Your Budget', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Budget')
     if data['name'] == '':
-        return Response('Please Enter Your Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Name')
     if data['email'] == '':
-        return Response('Please Enter Your Email', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Email')
     if data['contact'] == '':
-        return Response('Please Enter Your Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Your Contact Number')
     if len(data['contact']) > 15:
-        return Response('Please Enter Valid Contact Number', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Valid Contact Number')
+    
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     print(data['size'],
         data['time'],
@@ -620,26 +661,25 @@ def sendQuotation(request):
 # @permission_classes([IsAuthenticated])
 def sendContactUs(request):
     data = request.data
-    user = request.user
 
     error = False
     message = []
 
     if data['name'] == '':
         error = True
-        message.append('Please Enter Your Name')
+        message.append({'name': 'Please Enter Your Name'})
     if data['email'] == '':
         error = True
-        message.append('Please Enter Your Email')
+        message.append({'email':'Please Enter Your Email'})
     if data['contact'] == '':
         error = True
-        message.append('Please Enter Your Contact Number')
+        message.append({'contact':'Please Enter Your Contact Number'})
     if len(data['contact']) > 15:
         error = True
-        message.append('Please Enter Valid Contact Number')
+        message.append({'contact':'Please Enter Valid Contact Number'})
     if data['message'] == '':
         error = True
-        message.append('Please Enter Message')
+        message.append({'message': 'Please Enter Message'})
 
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
