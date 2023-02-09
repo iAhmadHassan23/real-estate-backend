@@ -368,16 +368,27 @@ def getReview(request, id):
 def createReview(request):
     data = request.data
 
+    error = False
+    message = []
+
     if data['name'] == '':
-        return Response('Please Enter Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Name')
     if data['profession'] == '':
-        return Response('Please Enter Profession', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Profession')
     if data['star'] == '':
-        return Response('Please Enter Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Star')
     if data['comment'] == '':
-        return Response('Please Enter Comment', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Comment')
     if data['image'] == '':
-        return Response('Please Enter Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Image')
+
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     
     else:
         review = HomeReview.objects.create(
@@ -397,16 +408,27 @@ def createReview(request):
 def updateReview(request, id):
     data = request.data
 
+    error = False
+    message = []
+
     if data['name'] == '':
-        return Response('Please Enter Name', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Name')
     if data['profession'] == '':
-        return Response('Please Enter Profession', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Profession')
     if data['star'] == '':
-        return Response('Please Enter Star', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Star')
     if data['comment'] == '':
-        return Response('Please Enter Comment', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Comment')
     if data['image'] == '':
-        return Response('Please Enter Image', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error = True
+        message.append('Please Enter Image')
+
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     review = HomeReview.objects.get(id=id)
     review.name = data['name']
@@ -454,32 +476,32 @@ def createBlog(request):
 
     if data['title'] == '':
         error = True
-        message.append('Please Enter Title')
+        message({'title': 'Please Enter Title'})
     if data['description'] == '':
         error = True
-        message.append('Please Enter Description')
+        message({'description':'Please Enter Description'})
     if data['blog_options'] == '':
         error = True
-        message.append('Please Enter Blog_options')
+        message({'blog_options': 'Please Enter Blog_options'})
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
                 error = True
-                message.append('Please Enter Post Image')
+                message({'bp_image': 'Please Enter Post Image'})
             if post['title'] == '':
                 error = True
-                message.append('Please Enter Post Title')
+                message({'bp_title': 'Please Enter Post Title'})
             if post['star'] == '':
                 error = True
-                message.append('Please Enter Post Star')
+                message({'bp_star':'Please Enter Post Star'})
             if post['price'] == '':
                 error = True
-                message.append('Please Enter Post Price')
+                message({'bp_price':'Please Enter Post Price'})
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
                 error = True
-                message.append('Please Enter Post Image')
+                message({'bi_image':'Please Enter Post Image'})
     
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -527,32 +549,32 @@ def updateBlog(request, id):
 
     if data['title'] == '':
         error = True
-        message('Please Enter Title')
+        message({'title': 'Please Enter Title'})
     if data['description'] == '':
         error = True
-        message('Please Enter Description')
+        message({'description':'Please Enter Description'})
     if data['blog_options'] == '':
         error = True
-        message('Please Enter Blog_options')
+        message({'blog_options': 'Please Enter Blog_options'})
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
                 error = True
-                message('Please Enter Post Image')
+                message({'bp_image': 'Please Enter Post Image'})
             if post['title'] == '':
                 error = True
-                message('Please Enter Post Title')
+                message({'bp_title': 'Please Enter Post Title'})
             if post['star'] == '':
                 error = True
-                message('Please Enter Post Star')
+                message({'bp_star':'Please Enter Post Star'})
             if post['price'] == '':
                 error = True
-                message('Please Enter Post Price')
+                message({'price':'Please Enter Post Price'})
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
                 error = True
-                message('Please Enter Post Image')
+                message({'bi_image':'Please Enter Post Image'})
     
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -606,25 +628,25 @@ def sendQuotation(request):
 
     if data['size'] == '':
         error = True
-        message.append('Please Select Size')
+        message.append({'size': 'Please Select Size'})
     if data['time'] == '':
         error = True
-        message.append('Please Select Time')
+        message.append({'time':'Please Select Time'})
     if data['budget'] == '':
         error = True
-        message.append('Please Enter Your Budget')
+        message.append({'budget':'Please Enter Your Budget'})
     if data['name'] == '':
         error = True
-        message.append('Please Enter Your Name')
+        message.append({'name':'Please Enter Your Name'})
     if data['email'] == '':
         error = True
-        message.append('Please Enter Your Email')
+        message.append({'email':'Please Enter Your Email'})
     if data['contact'] == '':
         error = True
-        message.append('Please Enter Your Contact Number')
+        message.append({'contact':'Please Enter Your Contact Number'})
     if len(data['contact']) > 15:
         error = True
-        message.append('Please Enter Valid Contact Number')
+        message.append({'contact':'Please Enter Valid Contact Number'})
     
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -677,9 +699,6 @@ def sendContactUs(request):
     if len(data['contact']) > 15:
         error = True
         message.append({'contact':'Please Enter Valid Contact Number'})
-    if data['message'] == '':
-        error = True
-        message.append({'message': 'Please Enter Message'})
 
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
