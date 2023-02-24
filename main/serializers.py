@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs, HomeImageSlider, ShortDescription
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -40,6 +40,7 @@ class UserSerializerWithToken(UserSerializer):
 
 class HomePageSerializer(serializers.ModelSerializer):
     Home_category = serializers.SerializerMethodField(read_only=True)
+    Home_img_slider = serializers.SerializerMethodField(read_only=True)
     HIW_steps = serializers.SerializerMethodField(read_only=True)
     Experts_blogs = serializers.SerializerMethodField(read_only=True)
     Blog_articles = serializers.SerializerMethodField(read_only=True)
@@ -52,6 +53,11 @@ class HomePageSerializer(serializers.ModelSerializer):
     def get_Home_category(self, obj):
         Home_category = obj.Home_category.all()
         serializer = HomeCategorySerializer(Home_category, many=True)
+        return serializer.data
+    
+    def get_Home_img_slider(self, obj):
+        Home_img_slider = obj.Home_img_slider.all()
+        serializer = HomeImageSliderSerializer(Home_img_slider, many=True)
         return serializer.data
     
     def get_HIW_steps(self, obj):
@@ -90,10 +96,25 @@ class HomeStepSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class HomeImageSliderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = HomeImageSlider
+        fields = '__all__'
+
+
+class ShortDescriptionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ShortDescription
+        fields = '__all__'
+
+
 class HomeBlogSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
     Blog_image = serializers.SerializerMethodField(read_only=True)
     Blog_posts = serializers.SerializerMethodField(read_only=True)
+    Short_description = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = HomeBlog
@@ -102,6 +123,11 @@ class HomeBlogSerializer(serializers.ModelSerializer):
     def get_Blog_image(self, obj):
         Blog_image = obj.Blog_image.all()
         serializer = BlogImageSerializer(Blog_image, many=True)
+        return serializer.data
+    
+    def get_Short_description(self, obj):
+        Short_description = obj.Short_description.all()
+        serializer = ShortDescriptionSerializer(Short_description, many=True)
         return serializer.data
     
     def get_Blog_posts(self, obj):

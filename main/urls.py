@@ -28,6 +28,12 @@ urlpatterns = [
     path('update/blog/<str:id>/', views.updateBlog, name="update-Blog"),
     path('delete/blog/<str:id>/', views.deleteBlog, name="delete-Blog"),
 
+    path('all/blog/articles/', views.allBlogArticles, name="all-Blog-Articles"),
+    path('create/blog/articles/', views.createBlogArticles, name="create-Blog-Articles"),
+    path('get/blog/articles/<str:id>/', views.getBlogArticles, name="get-Blog-Articles"),
+    path('update/blog/articles/<str:id>/', views.updateBlogArticles, name="update-Blog-Articles"),
+    path('delete/blog/articles/<str:id>/', views.deleteBlogArticles, name="delete-Blog-Articles"),
+
     path('send/quotation/', views.sendQuotation, name="send-quotation"),
     path('send/contactus/', views.sendContactUs, name="send-ContactUs"),
 ]

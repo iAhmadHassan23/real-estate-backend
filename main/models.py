@@ -13,6 +13,7 @@ class MainSite(models.Model):
     facebook_link = models.CharField(max_length=225,blank=True, default='')
     instagram_link = models.CharField(max_length=225,blank=True, default='')
     twitter_link = models.CharField(max_length=225,blank=True, default='')
+    tiktok_link = models.CharField(max_length=225,blank=True, default='')
     youtube_link = models.CharField(max_length=225,blank=True, default='')
     linkin_link = models.CharField(max_length=225,blank=True, default='')
     Main_metadata = models.ManyToManyField('MetaData', blank=True, default='')
@@ -27,15 +28,12 @@ class Homepage(models.Model):
     Home_tagline = models.CharField(max_length=225,blank=True, default='')
     Home_button = models.CharField(max_length=225,blank=True, default='')
     Home_button_link = models.CharField(max_length=225,blank=True, default='')
-    Home_bgimg = models.ImageField(blank=True, default='/placeholder.png')
+    Home_img_slider = models.ManyToManyField('HomeImageSlider', blank=True, default='')
     Home_category = models.ManyToManyField('HomeCategory', blank=True, default='')
 
     HIW_title = models.CharField(max_length=225,blank=True, default='')
-    HIW_tagline = models.CharField(max_length=225,blank=True, default='')
     HIW_steps = models.ManyToManyField('HomeStep', blank=True)
 
-    Experts_title = models.CharField(max_length=225,blank=True, default='')
-    Experts_tagline = models.CharField(max_length=225,blank=True, default='')
     Experts_blogs = models.ManyToManyField('HomeBlog', blank=True)
 
     Blog_articles = models.ManyToManyField('HomeBlogArticle', blank=True)
@@ -58,32 +56,31 @@ class HomeCategory(models.Model):
         return self.title
 
 
-class HomeStep(models.Model):
+class HomeImageSlider(models.Model):
     title = models.CharField(max_length=225,blank=True, default='')
-    description = models.CharField(max_length=225,blank=True, default='')
-    icon = models.ImageField(blank=True, default='/placeholder.png')
+    place = models.CharField(max_length=225,blank=True, default='')
+    image = models.ImageField(blank=True, default='/placeholder.png')
 
     createdAt = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.title
 
-DIRECTION_CHOICES =(
-    ("1", "Left"),
-    ("2", "Right"),
-)
 
-BLOG_CHOICES =(
-    ("1", "Simple Blog"),
-    ("2", "Blog with product cards"),
-)
+class HomeStep(models.Model):
+    title = models.CharField(max_length=225,blank=True, default='')
+    description = models.CharField(max_length=225,blank=True, default='')
+    icon = models.FileField(blank=True, default='/placeholder.png')
+
+    createdAt = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.title
+
 
 class HomeBlog(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=225,blank=True, default='')
     description = models.CharField(max_length=225,blank=True, default='')
-    short_description = models.CharField(max_length=225,blank=True, default='')
-    title_direction = models.CharField(choices = DIRECTION_CHOICES, max_length=225,blank=True, default='')
-    blog_options = models.CharField(choices = BLOG_CHOICES, max_length=225,blank=True, default='')
+    short_description = models.ManyToManyField('ShortDescription', blank=True)
     Blog_image = models.ManyToManyField('BlogImage', blank=True)
     Blog_posts = models.ManyToManyField('BlogPost', blank=True)
 
@@ -92,8 +89,17 @@ class HomeBlog(models.Model):
         return self.title
 
 
+class ShortDescription(models.Model):
+    title = models.CharField(max_length=225,blank=True, default='')
+
+    createdAt = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.title
+
+
 class BlogPost(models.Model):
     title = models.CharField(max_length=225,blank=True, default='')
+    special_tag = models.CharField(max_length=225,blank=True, default='')
     price = models.DecimalField(max_digits=9, decimal_places=0,blank=True, default=0)
     star = models.DecimalField(max_digits=9, decimal_places=0,blank=True, default=0)
     image = models.ImageField(blank=True, default='/placeholder.png')
@@ -104,13 +110,18 @@ class BlogPost(models.Model):
 
 
 class BlogImage(models.Model):
+    special_tag = models.CharField(max_length=225,blank=True, default='')
+    deal = models.CharField(max_length=225,blank=True, default='')
     image = models.ImageField(blank=True, default='/placeholder.png')
 
 
 class HomeBlogArticle(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=225,blank=True, default='')
-    description = models.CharField(max_length=225,blank=True, default='')
+    meta = models.CharField(max_length=225,blank=True, default='')
+    meta_description = models.CharField(max_length=225,blank=True, default='')
+    details = models.CharField(max_length=225,blank=True, default='')
+    slug = models.CharField(max_length=225,blank=True, default='')
     image = models.ImageField(blank=True, default='/placeholder.png')
 
     createdAt = models.DateTimeField(auto_now_add=True)

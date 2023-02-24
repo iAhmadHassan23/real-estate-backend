@@ -11,8 +11,8 @@ from django.conf import settings
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 
-from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs
-from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogSerializer, HomeReviewSerializer, QuotationSerializer, ContactUsSerializer
+from .models import Homepage, HomeBlog, HomeCategory, HomeReview, HomeStep, BlogImage, BlogPost, MainSite, HomeBlogArticle, MetaData, Quotation, ContactUs, HomeImageSlider, ShortDescription
+from .serializers import HomePageSerializer, MainSiteSerializer, UserSerializer, UserSerializerWithToken, HomeBlogArticleSerializer, HomeBlogSerializer, HomeReviewSerializer, QuotationSerializer, ContactUsSerializer
 
 import json
 
@@ -162,13 +162,21 @@ def getMainDetails(request):
 from PIL import Image  
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def uploadImage(request):
     data = request.data
     print(data['image'])
-    picture = Image.open(data['image'])  
-    picture = picture.save('images/' + str(data['image_name']) + '.' + str(data['image_format'])) 
-    return Response({'/' + str(data['image_name']) + '.' + str(data['image_format'])})
+    str(data['image_format'])
+    if str(data['image_format']) != 'json':
+        picture = Image.open(data['image'])  
+        picture = picture.save('images/' + str(data['image_name']) + '.' + str(data['image_format'])) 
+        return Response({'/' + str(data['image_name']) + '.' + str(data['image_format'])})
+    elif str(data['image_format']) == 'json':
+        value = json.load(data['image'])
+        save_file = open('images/' + str(data['image_name']) + '.' + str(data['image_format']), "w")  
+        json.dump(value, save_file)  
+        save_file.close()   
+        return Response({'/' + str(data['image_name']) + '.' + str(data['image_format'])})
 
 
 @api_view(['PUT'])
@@ -194,6 +202,24 @@ def updateHomePage(request):
             home_category.save()
             home.Home_category.add(home_category)
 
+    for slider in data['Home_img_slider']:
+        if slider['id'] != '':
+            home_slider = HomeImageSlider.objects.get(id=slider['id'])
+            home_slider.title = slider['title']
+            home_slider.place = slider['place']
+            print(slider['image'])
+            if '/images/'+str(home_slider.image) != slider['image']:
+                home_slider.image = slider['image']
+            home_slider.save()
+        else:
+            home_slider = HomeImageSlider.objects.create(
+                title = slider['title'],
+                place = slider['place'],
+                image = slider['image']
+            )
+            home_slider.save()
+            home.Home_img_slider.add(home_slider)
+
 
     for steps in data['HIW_steps']:
         if steps['id'] != '':
@@ -217,13 +243,15 @@ def updateHomePage(request):
         home_blog.title=blogs['title']
         home_blog.user=user
         home_blog.description=blogs['description']
-        home_blog.short_description=blogs['short_description']
-        home_blog.title_direction=blogs['title_direction']
-        home_blog.blog_options=blogs['blog_options']
+        for short_desc in blogs['Short_description']:
+            blog_short_desc = BlogPost.objects.get(id=short_desc['id'])
+            blog_short_desc.title = short_desc['title']
+            blog_short_desc.save()
         if len(blogs['Blog_image']) == 0:
             for posts in blogs['Blog_posts']:
                 blog_posts=BlogPost.objects.get(id=posts['id'])
                 blog_posts.title=posts['title']
+                blog_posts.special_tag=posts['special_tag']
                 blog_posts.price=posts['price']
                 blog_posts.star=posts['star']
                 if '/images/'+str(blog_posts.image) != posts['image']:
@@ -232,6 +260,8 @@ def updateHomePage(request):
         else:
             for image in blogs['Blog_image']:
                 blog_images=BlogImage.objects.get(id=image['id'])
+                blog_images.special_tag=image['special_tag']
+                blog_images.deal=image['deal']
                 if '/images/'+str(blog_images.image) != image['image']:
                     blog_images.image=image['image']
                 blog_images.save()
@@ -243,7 +273,9 @@ def updateHomePage(request):
         home_blog_article=HomeBlogArticle.objects.get(id=article['id'])
         home_blog_article.title=article['title']
         home_blog_article.user=user
-        home_blog_article.description=article['description']
+        home_blog_article.meta_description=article['meta_description']
+        home_blog_article.meta=article['meta']
+        home_blog_article.details=article['details']
         if '/images/'+str(home_blog_article.image) == article['image']:
             home_blog_article.image=article['image']
         home_blog_article.save()
@@ -273,12 +305,7 @@ def updateHomePage(request):
     home.Home_tagline=data['Home_tagline']
     home.Home_button=data['Home_button']
     home.Home_button_link=data['Home_button_link']
-    if '/images/'+str(home.Home_bgimg) != data['Home_bgimg']:
-        home.Home_bgimg=data['Home_bgimg']
     home.HIW_title=data['HIW_title']
-    home.HIW_tagline=data['HIW_tagline']
-    home.Experts_title=data['Experts_title']
-    home.Experts_tagline=data['Experts_tagline']
     home.Rev_title=data['Rev_title']
     home.Rev_tagline=data['Rev_tagline']
 
@@ -340,6 +367,7 @@ def updateMain(request):
     main.facebook_link=data['facebook_link']
     main.instagram_link=data['instagram_link']
     main.twitter_link=data['twitter_link']
+    main.tiktok_link=data['tiktok_link']
     main.youtube_link=data['youtube_link']
     main.linkin_link=data['linkin_link']
 
@@ -477,32 +505,32 @@ def createBlog(request):
 
     if data['title'] == '':
         error = True
-        message({'title': 'Please Enter Title'})
+        message.append({'title': 'Please Enter Title'})
     if data['description'] == '':
         error = True
-        message({'description':'Please Enter Description'})
+        message.append({'description':'Please Enter Description'})
     if data['blog_options'] == '':
         error = True
-        message({'blog_options': 'Please Enter Blog_options'})
+        message.append({'blog_options': 'Please Enter Blog_options'})
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
                 error = True
-                message({'bp_image': 'Please Enter Post Image'})
+                message.append({'bp_image': 'Please Enter Post Image'})
             if post['title'] == '':
                 error = True
-                message({'bp_title': 'Please Enter Post Title'})
+                message.append({'bp_title': 'Please Enter Post Title'})
             if post['star'] == '':
                 error = True
-                message({'bp_star':'Please Enter Post Star'})
+                message.append({'bp_star':'Please Enter Post Star'})
             if post['price'] == '':
                 error = True
-                message({'bp_price':'Please Enter Post Price'})
+                message.append({'bp_price':'Please Enter Post Price'})
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
                 error = True
-                message({'bi_image':'Please Enter Post Image'})
+                message.append({'bi_image':'Please Enter Post Image'})
     
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -550,32 +578,32 @@ def updateBlog(request, id):
 
     if data['title'] == '':
         error = True
-        message({'title': 'Please Enter Title'})
+        message.append({'title': 'Please Enter Title'})
     if data['description'] == '':
         error = True
-        message({'description':'Please Enter Description'})
+        message.append({'description':'Please Enter Description'})
     if data['blog_options'] == '':
         error = True
-        message({'blog_options': 'Please Enter Blog_options'})
+        message.append({'blog_options': 'Please Enter Blog_options'})
     if len(data['Blog_image']) == 0:
         for post in data['Blog_posts']:
             if post['image'] == '':
                 error = True
-                message({'bp_image': 'Please Enter Post Image'})
+                message.append({'bp_image': 'Please Enter Post Image'})
             if post['title'] == '':
                 error = True
-                message({'bp_title': 'Please Enter Post Title'})
+                message.append({'bp_title': 'Please Enter Post Title'})
             if post['star'] == '':
                 error = True
-                message({'bp_star':'Please Enter Post Star'})
+                message.append({'bp_star':'Please Enter Post Star'})
             if post['price'] == '':
                 error = True
-                message({'price':'Please Enter Post Price'})
+                message.append({'price':'Please Enter Post Price'})
     else:
         for image in data['Blog_image']:
             if image['image'] == '':
                 error = True
-                message({'bi_image':'Please Enter Post Image'})
+                message.append({'bi_image':'Please Enter Post Image'})
     
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -584,7 +612,6 @@ def updateBlog(request, id):
     blog.user=user
     blog.description=data['description']
     blog.short_description=data['short_description']
-    blog.blog_options=data['blog_options']
 
     if len(blog['Blog_image']) == 0:
         for posts in blog['Blog_posts']:
@@ -618,11 +645,173 @@ def deleteBlog(request, id):
     return Response("Blog Deleted")
 
 
+
+@api_view(['GET'])
+def allBlogArticles(request):
+    blogArticles = HomeBlogArticle.objects.all()
+    serailizer = HomeBlogArticleSerializer(blogArticles, many=True)
+    return Response(serailizer.data)
+
+
+@api_view(['GET'])
+def getBlogArticles(request, id):
+    blogArticles = HomeBlogArticle.objects.get(id=id)
+    serailizer = HomeBlogArticleSerializer(blogArticles, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createBlogArticles(request):
+    data = request.data
+    user = request.user
+
+    blogArticlesAll = HomeBlogArticle.objects.all()
+
+    error = False
+    message = []
+
+    if data['title'] == '':
+        error = True
+        message.append({'title': 'Please Enter Article Title'})
+    if data['details'] == '':
+        error = True
+        message.append({'details':'Please Enter Article Details'})
+    if data['image'] == '':
+        error = True
+        message.append({'image': 'Please Enter Blog Article Image'})
+    
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    if data['slug'] == '':
+        slug = data['title'].replace(' ','-')
+    else:
+        slug = data['slug']
+    
+    New = False
+
+    if data['status'] == '0':
+        for article in blogArticlesAll:
+            if article.slug == slug:
+                New = True
+                return Response({'message': "Slug already exist. Do you want to add '2' next to slug or not?"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    elif data['status'] == '1':
+        New = True
+        blogArticles = HomeBlogArticle.objects.create(
+            user = user,
+            title = data['title'],
+            meta = data['meta'],
+            meta_description = data['meta_description'],
+            details = data['details'],
+            image = data['image'],
+            slug = slug + '2'
+        )
+        blogArticles.save()
+    
+
+    if New == False:
+        blogArticles = HomeBlogArticle.objects.create(
+            user = user,
+            title = data['title'],
+            meta = data['meta'],
+            meta_description = data['meta_description'],
+            details = data['details'],
+            image = data['image'],
+            slug = slug
+        )
+        blogArticles.save()
+    
+
+    serailizer = HomeBlogArticleSerializer(blogArticles, many=False)
+    return Response(serailizer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateBlogArticles(request, id):
+    data = request.data
+    user = request.user
+    blogArticles = HomeBlogArticle.objects.get(id=id)
+
+    blogArticlesAll = HomeBlogArticle.objects.exclude(id=id)
+
+    
+
+    error = False
+    message = []
+
+    if data['title'] == '':
+        error = True
+        message.append({'title': 'Please Enter Article Title'})
+    if data['details'] == '':
+        error = True
+        message.append({'details':'Please Enter Article Details'})
+    if data['image'] == '':
+        error = True
+        message.append({'image': 'Please Enter Blog Article Image'})
+    
+    if error == True:
+        return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+    New = False
+    
+    length = 0
+    for article in blogArticlesAll:
+        if article.slug == data['slug']:
+            New = True
+            length += 1
+    if data['status'] == '0':
+        for article in blogArticlesAll:
+            if article.slug == data['slug']:
+                New = True
+                return Response({'message': "Slug already exist. Do you want to add '2' next to slug or not?"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    elif data['status'] == '1':
+        New = True
+        blogArticles = HomeBlogArticle.objects.create(
+            user = user,
+            title = data['title'],
+            meta = data['meta'],
+            meta_description = data['meta_description'],
+            details = data['details'],
+            image = data['image'],
+            slug = data['slug'] + str(length)
+        )
+        blogArticles.save()
+    
+
+    if New == False:
+        blogArticles.title=data['title']
+        blogArticles.meta=data['meta']
+        blogArticles.meta_description=data['meta_description']
+        blogArticles.details=data['details']
+        blogArticles.slug=data['slug']
+
+        if '/images/'+str(blogArticles.image) != data['image']:
+            blogArticles.image=data['image']
+
+        blogArticles.save()
+    serailizer = HomeBlogArticleSerializer(blogArticles, many=False)
+    return Response(serailizer.data)
+
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteBlogArticles(request, id):
+    blogArticles = HomeBlogArticle.objects.get(id=id)
+    blogArticles.delete()
+    serailizer = HomeBlogArticleSerializer(blogArticles, many=False)
+    return Response("Blog Article Deleted")
+
+
+
+
+
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 def sendQuotation(request):
     data = request.data
-
     error = False
     message = []
 
@@ -630,70 +819,58 @@ def sendQuotation(request):
     if data['size'] == '':
         error = True
         message.append({'size': 'Please Select Size'})
-    if data['time'] == '':
-        error = True
-        message.append({'time':'Please Select Time'})
     if data['budget'] == '':
         error = True
         message.append({'budget':'Please Enter Your Budget'})
-    if data['name'] == '':
-        error = True
-        message.append({'name':'Please Enter Your Name'})
     if data['email'] == '':
         error = True
         message.append({'email':'Please Enter Your Email'})
-    if data['contact'] == '':
-        error = True
-        message.append({'contact':'Please Enter Your Contact Number'})
-    if len(data['contact']) > 15:
-        error = True
-        message.append({'contact':'Please Enter Valid Contact Number'})
     
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-    print(data['size'],
-        data['time'],
-        data['budget'],
-        data['name'],
-        data['email'],
-        data['contact'],
-        data['comment'])
+    if data['contact'] == '':
+        contact = 0
+    else:
+        contact = data['contact']
+    
     quotation = Quotation.objects.create(
         size = data['size'],
-        time = data['time'],
         budget = data['budget'],
         name = data['name'],
         email = data['email'],
-        contact = data['contact'],
+        contact = contact,
         comment = data['comment'],
     )
     quotation.save()
 
     subject = f"Quotation Request for {quotation.size} appartment"
-    message = f"Client need {quotation.size} appartment for {quotation.time} having budget {quotation.budget}. \n Client Detail: \n Name: {quotation.name} \n Email: {quotation.email} \n Contact #: {quotation.contact} \n Comment: '{quotation.comment}"
+    if quotation.time == '':
+        message = f"Client need {quotation.size} appartment in budget {quotation.budget}. \n\n Client Detail: \n Email: {quotation.email} \n Comment: '{quotation.comment}"
+    else:
+        message = f"Client need {quotation.size} appartment for {quotation.time} having budget {quotation.budget}. \n\n Client Detail: \n Email: {quotation.email} \n Comment: '{quotation.comment}"
     html_template = 'emailtemplate.html'
     context = {'message': message, 'name': settings.EMAIL_HOST_USER}
     html_message = render_to_string(html_template, context=context)
     email_from = settings.EMAIL_HOST_USER
-    recipient_list = [settings.EMAIL_HOST_USER, quotation.email, ]
+    recipient_list = [settings.EMAIL_HOST_USER, ]
     email_message = EmailMessage( subject, html_message, email_from, recipient_list )
 
     email_message.content_subtype = 'html'
     email_message.send()
 
 
-    subject = 'Successfully send request for quotation'
-    message = f'Your request for quotation is recieved.'
-    html_template = 'emailtemplate.html'
-    context = {'message': message, 'name': quotation.name, 'email': quotation.email, 'contact': quotation.contact }
-    html_message = render_to_string(html_template, context=context)
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [quotation.email, ]
-    email_message = EmailMessage( subject, html_message, email_from, recipient_list )
+    # subject = 'Successfully send request for quotation'
+    # message = f'Your request for quotation is recieved.'
+    # html_template = 'emailtemplate.html'
+    # context = {'message': message, 'name': quotation.name, 'email': quotation.email, 'contact': quotation.contact }
+    # html_message = render_to_string(html_template, context=context)
+    # email_from = settings.EMAIL_HOST_USER
+    # recipient_list = [quotation.email, ]
+    # email_message = EmailMessage( subject, html_message, email_from, recipient_list )
 
-    email_message.content_subtype = 'html'
-    email_message.send()
+    # email_message.content_subtype = 'html'
+    # email_message.send()
 
     serailizer = QuotationSerializer(quotation, many=False)
     return Response(serailizer.data)
@@ -707,26 +884,21 @@ def sendContactUs(request):
     error = False
     message = []
 
-    if data['name'] == '':
-        error = True
-        message.append({'name': 'Please Enter Your Name'})
     if data['email'] == '':
         error = True
         message.append({'email':'Please Enter Your Email'})
-    if data['contact'] == '':
-        error = True
-        message.append({'contact':'Please Enter Your Contact Number'})
-    if len(data['contact']) > 15:
-        error = True
-        message.append({'contact':'Please Enter Valid Contact Number'})
 
     if error == True:
         return Response(message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+    if data['contact'] == '':
+        contact = 0
+    else:
+        contact = data['contact']
     contact = ContactUs.objects.create(
         name = data['name'],
         email = data['email'],
-        contact = data['contact'],
+        contact = contact,
         message = data['message'],
     )
     contact.save()
@@ -737,24 +909,24 @@ def sendContactUs(request):
     context = {'message': message, 'name': settings.EMAIL_HOST_USER}
     html_message = render_to_string(html_template, context=context)
     email_from = settings.EMAIL_HOST_USER
-    recipient_list = [settings.EMAIL_HOST_USER, contact.email, ]
+    recipient_list = [settings.EMAIL_HOST_USER, ]
     email_message = EmailMessage( subject, html_message, email_from, recipient_list )
 
     email_message.content_subtype = 'html'
     email_message.send()
 
 
-    subject = 'Contact with Apartmentgoats'
-    message = f'Thankyou for contacting us.'
-    html_template = 'emailtemplate.html'
-    context = {'message': message, 'name': contact.name, 'email': contact.email, 'contact': contact.contact }
-    html_message = render_to_string(html_template, context=context)
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [contact.email, ]
-    email_message = EmailMessage( subject, html_message, email_from, recipient_list )
+    # subject = 'Contact with Apartmentgoats'
+    # message = f'Thankyou for contacting us.'
+    # html_template = 'emailtemplate.html'
+    # context = {'message': message, 'name': contact.name, 'email': contact.email, 'contact': contact.contact }
+    # html_message = render_to_string(html_template, context=context)
+    # email_from = settings.EMAIL_HOST_USER
+    # recipient_list = [contact.email, ]
+    # email_message = EmailMessage( subject, html_message, email_from, recipient_list )
 
-    email_message.content_subtype = 'html'
-    email_message.send()
+    # email_message.content_subtype = 'html'
+    # email_message.send()
 
     serailizer = ContactUsSerializer(contact, many=False)
     return Response(serailizer.data)
